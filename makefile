@@ -1,6 +1,6 @@
 CARGS= -Wall -pedantic -std=c99 -g
 
-MENSAJE = Instancias de prueba
+MENSAJE = mochila mochilaa
 
 PRUEBAS= laberintos.c
 EXEC = grafoExec
