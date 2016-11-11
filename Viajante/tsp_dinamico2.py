@@ -3,50 +3,6 @@ import random
 import time
 import gc
 
-def subsets(m, n, idx, prev):
-	u"""Devuelve un set con todas los subsets de {idx..n}, de tamaño m.
-	
-	Parámetros:
-	m -- tamaño de los subsets a formar.
-	n -- tamaño del set original.
-	idx -- elemento inicial del set original.
-	
-	Los subsets se forman sin incluir permutaciones.
-		i.e. {2, 3, 4} = {3, 2, 4}
-	El set original de tamaño n se forma con los enteros de 0 hasta n-1.
-	Los subsets a formar no incluyen los primeros idx elementos.
-	
-	Devuelve un set de todos los subsets s tq:
-		|s| = m
-		s contenido en N = {idx, idx+1, idx+2, ... , n-2, n-1}
-	"""
-	
-	# Casos base
-	if (m == 1):
-		return [[i] for i in range(idx, n)]
-	
-	if (idx > n-m):
-		return []
-	
-	sets = []
-	if ((m-1, n, idx+1) in prev):
-		sset = prev[(m-1, n, idx+1)]
-	else:
-		prev[(m-1, n, idx+1)] = subsets(m-1, n, idx+1, prev)
-		sset = prev[(m-1, n, idx+1)]
-	
-	for s in sset:
-		sets += [[idx] + s]
-		
-	if ((m, n, idx+1) in prev):
-		sset = prev[(m, n, idx+1)]
-	else:
-		prev[(m, n, idx+1)] = subsets(m, n, idx+1, prev)
-		sset = prev[(m, n, idx+1)]
-	sets += sset
-	return sets
-
-
 def computar_minimo(d, s, k, adj):
 	u"""Computa el camino minimo que pasa por todos los nodos de s y termina en k.
 	
@@ -63,18 +19,14 @@ def computar_minimo(d, s, k, adj):
 	Obs: dist[(s, k)] = d[(s, k)][0]
 	"""
 	
-	minimo = (0, 0)
-	
-	tmp = set(s)
-	tmp.remove(k)
-	tmp = frozenset(tmp)
-	for m in s:
-		if (m != k):
-			dist = d[(tmp, m)]
-			dist = (dist[0] + adj[m][k], m)
-			# Si no vi ningún mínimo, o si encontré un resultado mejor
-			if ( (dist[0] < minimo[0]) or (minimo[1] == 0) ):
-				minimo = dist
+	minimo = (0, 0)	
+	for i in range(0, len(s)):
+		m = s[i]
+		dist = d[(s, m)]
+		dist = (dist[0] + adj[m][k], m)
+		# Si no vi ningún mínimo, o si encontré un resultado mejor
+		if ( (dist[0] < minimo[0]) or (minimo[1] == 0) ):
+			minimo = dist
 	return minimo
 
 
@@ -95,22 +47,31 @@ def tsp_dinamico(adj, n):
 	d = {}
 	
 	# Inicializo la estructura de la tabla de soluciones parciales
+	subsets = []
 	for i in range(1, n):
-		s = frozenset([i])
+		s = (i,)
 		d[(s,i)] = (adj[0][i], 0)
+		subsets.append(s)
 	
 	# Para cada longitud de camino posible
 	for m in range(2, n):
-		
 		loop_start = time.time()
-		# Para cada subset de m vértices
-		ssets = subsets(m, n, 1, {})
+		# Obtengo los subsets de |s| = m
+		
+		new_subsets = []
+		for elem in subsets:
+			for i in range(elem[-1] + 1, n):
+				new_subsets.append(elem + (i,))
+		subsets = new_subsets
+		
 		loop_set = time.time()
-		for s in ssets:
+		# Para cada subset de m vértices
+		for s in subsets:
 			# Para cada vértice en el subset
-			fss = frozenset(s)
-			for k in s:
-				d[(fss, k)] = computar_minimo(d, s, k, adj)
+			for i in range(0, len(s)):
+				k = s[i]
+				tmp = s[0:i] + s[i+1:len(s)]
+				d[(s, k)] = computar_minimo(d, tmp, k, adj)
 		
 		loop_end = time.time()
 		gc.collect()
@@ -120,10 +81,9 @@ def tsp_dinamico(adj, n):
 	# Ya tengo todos los caminos mínimos que pasan por todos los nodos
 	# Falta ver cual es el que genera distancia menor de vuelta al origen
 	minimo = (0, 0)
-	s = set([i for i in range(1, n)])
-	fss = frozenset(s)
+	s = tuple([i for i in range(1, n)])
 	for k in s:
-		dist = d[(fss, k)]
+		dist = d[(s, k)]
 		dist = (dist[0] + adj[k][0], k)
 		if ( (dist[0] < minimo[0]) or (minimo[1] == 0) ):
 			minimo = dist
@@ -133,8 +93,11 @@ def tsp_dinamico(adj, n):
 	last = minimo[1]
 	for i in range(1, n):
 		camino = [last] + camino
-		dist = d[(frozenset(s), last)]
-		s.remove(last)
+		dist = d[(s, last)]
+		for j in range(0, len(s)):
+			if (s[j] == last):
+				tmp = s[0:j] + s[j+1:len(s)]
+		s = tmp
 		last = dist[1]
 	
 	camino = [0] + camino
@@ -152,6 +115,17 @@ def mat_rnd(n):
 	return mat
 
 
+#for i in range(4, 48):
+#	adj = mat_rnd(i)
+#	print "\nCamino mínimo: ", i
+#	start = time.time()
+#	print tsp_dinamico(adj, i)
+#	end = time.time()
+#	print(end-start)
+#	gc.collect()
+
+
+# Cargar de archivo. IMPORTANTE: una línea = una fila, no agregar lineas en blanco al final
 file = open("test2.txt")
 ady = []
 i = 0
@@ -161,7 +135,6 @@ for line in file:
 		tmp.append(int(number))
 	ady.append(tmp)
 	i += 1
-		
 
 # Matriz random, asimétrica
 i = 20
@@ -171,4 +144,5 @@ start = time.time()
 print tsp_dinamico(ady, i)
 end = time.time()
 
+		
 		
