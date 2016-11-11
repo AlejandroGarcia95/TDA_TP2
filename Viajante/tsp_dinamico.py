@@ -152,7 +152,7 @@ def mat_rnd(n):
 	return mat
 
 
-file = open("test2.txt")
+file = open("test.txt")
 ady = []
 i = 0
 for line in file:
