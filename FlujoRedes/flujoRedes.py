@@ -96,8 +96,6 @@ def obtenerAristasCorteMin(red):
 	dfs(red, "s", visitados)
 	
 	for elemento in visitados:
-		if elemento[0] == "A":
-			continue
 		for arista in (red.obtenerAristas(elemento)):
 			if not arista.capacidad:
 				continue
