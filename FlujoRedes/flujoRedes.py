@@ -1,6 +1,6 @@
 class Arista(object):
-	'''	Clase Arista. Se crea con un nodo fuente u, un nodo sumidero v y la capacidad
-		de la arista w. RevArista es la arista que va de v hacia u. '''
+	''' Clase Arista. Se crea con un nodo fuente u, un nodo sumidero v y la capacidad 
+	de la arista w. RevArista es la arista que va de v hacia u. '''
 	def __init__(self,u,v,w):
 		self.fuente = u
 		self.sumidero = v
@@ -12,10 +12,10 @@ class Arista(object):
 
 
 class RedDeFlujo(object):
-	'''	Clase RedDeFlujo. Se crea un diccionario con los adyacentes a un vertice y otro con 
-		el flujo correspondiente a cada arista. Se calcula el flujo maximo utilizando el 
-		algoritmo de Ford-Fulkerson. El metodo obtenerCamino es el que busca un augmenting
-		path de s a t mediante DFS.'''
+	''' Clase RedDeFlujo. Se crea un diccionario con los adyacentes a un vertice y otro con 
+    el flujo correspondiente a cada arista. Se calcula el flujo maximo utilizando el algoritmo 
+    de Ford-Fulkerson. El metodo obtenerCamino es el que busca un augmenting path de s a t 
+    mediante DFS.'''
 	def __init__(self):
 		self.adyacentes = {}
 		self.flujo = {}
@@ -66,8 +66,8 @@ class RedDeFlujo(object):
 		return flujoMax
 
 ''' Crea un flujo de red a partir de un archivo con el formato especificado en el enunciado.
-	Si cormen es True, la red obtenida seguira las relaciones propuestas por el libro Cormen
-	mientras que si es False, seguira las que propone Kleinberg & Tardos. '''
+Si cormen es True, la red obtenida seguira las relaciones propuestas por el libro Cormen 
+mientras que si es False, seguira las que propone Kleinberg & Tardos. '''
 def crearRed(archivo, cormen = False):
 	arch = open(archivo,"r")
 	
@@ -103,19 +103,18 @@ def crearRed(archivo, cormen = False):
 	arch.close()
 	if cormen:
 		return (red,cantProyectos)
-	else:
-		return red
+	return red
 
-'''	Realiza una busqueda en profundidad a partir del grafo residual, el nodo inicial s
-	y una lista con los nodos que se van visitando. Finalmente, visitados sera el conjunto S
-	de todos los nodos alcanzables por s, que constituyen la solucion al problema.'''
+''' Realiza una busqueda en profundidad a partir del grafo residual, el nodo inicial s y 
+una lista con los nodos que se van visitando. Finalmente, visitados sera el conjunto S 
+de todos los nodos alcanzables por s, que constituyen la solucion al problema.'''
 def dfs(grafoRes, inicial, visitados):
 	visitados.append(inicial)
 	for siguiente in grafoRes.obtenerAristas(inicial):
 		if (siguiente.capacidad - grafoRes.flujo[siguiente]) > 0 and siguiente.sumidero not in visitados:
 			dfs(grafoRes, siguiente.sumidero, visitados)
 
-'''	Obtiene las aristas que cruzan el corte minimo entre s y t. '''		
+''' Obtiene las aristas que cruzan el corte minimo entre s y t. '''		
 def obtenerAristasCorteMin(red):
 	visitados = []
 	aristasCorteMin = []
@@ -132,8 +131,8 @@ def obtenerAristasCorteMin(red):
 				
 	return aristasCorteMin
 
-'''	A partir del flujo de red y de las aristas de corte minimo, obtiene los
-	expertos a contratar para la version del Cormen.'''
+''' A partir del flujo de red y de las aristas de corte minimo, obtiene los 
+expertos a contratar para la version del Cormen.'''
 def expertosContratados(red, aristasCorteMin):
 	expertos = ""
 	for adyacente in red.obtenerAristas("s"):
@@ -143,8 +142,8 @@ def expertosContratados(red, aristasCorteMin):
 	return expertos
 	
 	
-'''	A partir del flujo de red, de las aristas de corte minimo y de la cantidad
-	de proyectos posibles, obtiene los proyectos a aceptar para la version del Cormen.'''	
+''' A partir del flujo de red, de las aristas de corte minimo y de la cantidad de 
+proyectos posibles, obtiene los proyectos a aceptar para la version del Cormen.'''	
 def proyectosAceptados(red, aristasCorteMin, cantProy):
 	proyectos = ""
 	for proy in range(cantProy):
@@ -154,7 +153,7 @@ def proyectosAceptados(red, aristasCorteMin, cantProy):
 	return proyectos
 
 ''' Algoritmo que resuelve el problema de seleccion de proyectos a partir de un 
-	archivo con el formato pedido. Devuelve los proyectos y expertos seleccionados. '''
+archivo con el formato pedido. Devuelve los proyectos y expertos seleccionados. '''
 def determinarProyectosExpertos(archivo):
 	visitados = []
 	red = crearRed(archivo)
@@ -174,8 +173,8 @@ def determinarProyectosExpertos(archivo):
 	return p + ", " + e
 	
 ''' Algoritmo que resuelve el problema de seleccion de proyectos a partir de un 
-	archivo con el formato pedido. Lo resuelve siguiendo lo propuesto por el Cormen.
-	Devuelve los proyectos y expertos seleccionados. '''
+archivo con el formato pedido. Lo resuelve siguiendo lo propuesto por el Cormen.
+Devuelve los proyectos y expertos seleccionados. '''
 def determinarProyectosExpertosCormen(archivo):
 	visitados = []
 	datos = crearRed(archivo, True)
@@ -211,7 +210,7 @@ print (g.flujoMaximo("s","t")) == 5
 '''
 datos = crearRed("ejemplotp.txt", True)
 red = datos[0] 
-red.flujoMaximo("s","t")
+print red.flujoMaximo("s","t")
 ar = obtenerAristasCorteMin(red)
 print expertosContratados(red,ar)
 print proyectosAceptados(red, ar, datos[1])
@@ -300,7 +299,36 @@ dfs(red, "s", visitados)
 print visitados
 '''
 
-# Prueba algoritmo final
+## Prueba algoritmo final
 
+## Pruebas generales
 #print determinarProyectosExpertos("ejemplotp.txt")
 #print determinarProyectosExpertosCormen("ejemplotp.txt")
+#print determinarProyectosExpertos("t1.txt")
+#print determinarProyectosExpertosCormen("t1.txt")
+#print determinarProyectosExpertos("t5.txt")
+#print determinarProyectosExpertosCormen("t5.txt")
+#print determinarProyectosExpertos("t6.txt")
+#print determinarProyectosExpertosCormen("t6.txt")
+#print determinarProyectosExpertos("t7.txt")
+#print determinarProyectosExpertosCormen("t7.txt")
+#print determinarProyectosExpertos("t8.txt")
+#print determinarProyectosExpertosCormen("t8.txt")
+#print determinarProyectosExpertos("t9.txt")
+#print determinarProyectosExpertosCormen("t9.txt")
+#print determinarProyectosExpertos("t10.txt")
+#print determinarProyectosExpertosCormen("t10.txt")
+#print determinarProyectosExpertos("t11.txt")
+#print determinarProyectosExpertosCormen("t11.txt")
+
+## Prueba ganancia igual a costo
+#print determinarProyectosExpertos("t2.txt")
+#print determinarProyectosExpertosCormen("t2.txt")
+
+## Prueba "conviene todo"
+#print determinarProyectosExpertos("t3.txt")
+#print determinarProyectosExpertosCormen("t3.txt")
+
+## Prueba "no conviene nada"
+#print determinarProyectosExpertos("t4.txt")
+#print determinarProyectosExpertosCormen("t4.txt")
